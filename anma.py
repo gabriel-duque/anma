@@ -48,9 +48,6 @@ def print_note(key):
 def print_rgb(key):
     print(colors[keys[key][1]])
 
-def play_key(key):
-    pass
-
 def add_note(m_file, key, time):
     m_file.addNote(0, 0, keys[key][1], time, 1, 100)
 
@@ -81,16 +78,17 @@ def main():
             if  key in keys:
                 print_note(key)
                 print_rgb(key)
-                play_key(key)
 
                 player.note_on(keys[key][1], 100)
-                time.sleep(1)
-                player.note_off(keys[key][1], 100)
 
                 add_note(m_file, key, t)
                 t += 1
             else:
                 print("key " + key + " is not mapped")
+        elif event.type == pygame.KEYUP:
+            key = get_key(event)
+            if  key in keys:
+                player.note_off(keys[key][1], 100)
         time.sleep(0.05)
     with open('out.mid', 'wb') as output:
         m_file.writeFile(output)
