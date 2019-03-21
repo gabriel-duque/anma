@@ -7,19 +7,20 @@ with contextlib.redirect_stdout(None):
 import time
 import tkinter
 import tkinter.filedialog
+import midiutil
 
 colors = []
 
 keys = {
-        's': ('do', 59),
-        'e': ('do#', 60),
-        'd': ('re', 61),
-        'r': ('re#', 62),
-        'f': ('mi', 63),
-        'g': ('fa', 64),
-        'y': ('fa#', 65),
-        'h': ('sol', 66),
-        'u': ('sol#', 67),
+        's': ('do', 60),
+        'e': ('do#', 61),
+        'd': ('re', 62),
+        'r': ('re#', 63),
+        'f': ('mi', 64),
+        'g': ('fa', 65),
+        'y': ('fa#', 66),
+        'h': ('sol', 67),
+        'u': ('sol#', 68),
         'j': ('la', 69),
         'i': ('la#', 70),
         'k': ('si', 71),
@@ -40,21 +41,24 @@ def get_key(event):
     return pygame.key.name(event.key)
 
 def print_note(key):
-    if  key in keys:
-        print(key, end=" ")
-        print(keys[key][0], end=" ")
+    print(key, end=" ")
+    print(keys[key][0], end=" ")
 
 def print_rgb(key):
-    if key in keys:
-        print(colors[keys[key][1]])
-    else:
-        print("key " + key + " is not mapped")
+    print(colors[keys[key][1]])
 
 def play_key(key):
     pass
 
+def add_note(m_file, key, time):
+    m_file.addNote(0, 0, keys[key][1], time, 1, 100)
+
 def main():
+    t = 0
+    tempo = 120
     #pygame.mixer.init(fps, -16, 1, 2048)
+    m_file = midiutil.MIDIFile(1)
+    #m_file.addTempo(0, time, tempo)
     config_file = get_config_filename()
     init(config_file) # Read config
     screen = pygame.display.set_mode((220, 220))
@@ -69,10 +73,17 @@ def main():
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 break
-            print_note(key)
-            print_rgb(key)
-            play_key(key)
+            if  key in keys:
+                print_note(key)
+                print_rgb(key)
+                play_key(key)
+                add_note(m_file, key, t)
+                t += 1
+            else:
+                print("key " + key + " is not mapped")
         time.sleep(0.05)
+    with open('out.mid', 'wb') as output:
+        m_file.writeFile(output)
 
 
 if __name__ == '__main__':
