@@ -10,7 +10,8 @@ import time
 import tkinter
 import tkinter.filedialog
 
-colors = []
+color_codes = []
+colors = [[0, 0, 255], [255, 133, 0], [255, 0, 0], [0, 255, 0], [255, 255, 255]]
 
 keys = {
         's': ('do', 60),
@@ -34,9 +35,9 @@ def get_config_filename():
     tkinter.filedialog.askopenfilename()
 
 def init(config_file):
-    global colors
+    global color_codes
     with open("anma.conf", "r") as conf:
-        colors = [int(line.strip()) for line in conf.readlines()]
+        color_codes = [int(line.strip()) for line in conf.readlines()]
 
 def get_key(event):
     return pygame.key.name(event.key)
@@ -46,7 +47,11 @@ def print_note(key):
     print(keys[key][0], end=" ")
 
 def print_rgb(key):
-    print(colors[keys[key][1]])
+    print(color_codes[keys[key][1]])
+
+def set_rgb(key, screen):
+    screen.fill(colors[color_codes[keys[key][1]]])
+    pygame.display.update()
 
 def add_note(m_file, key, time):
     m_file.addNote(0, 0, keys[key][1], time, 1, 100)
@@ -78,6 +83,7 @@ def main():
             if  key in keys:
                 print_note(key)
                 print_rgb(key)
+                set_rgb(key, screen)
 
                 player.note_on(keys[key][1], 100)
 
