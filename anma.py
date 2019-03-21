@@ -3,11 +3,12 @@
 import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
+    import pygame.midi
 
+import midiutil
 import time
 import tkinter
 import tkinter.filedialog
-import midiutil
 
 colors = []
 
@@ -66,6 +67,10 @@ def main():
     bg = pygame.image.load('cat.png')
     screen.blit(bg, (0, 0))
     pygame.display.update()
+
+    pygame.midi.init()
+    player = pygame.midi.Output(0)
+    player.set_instrument(0)
     while True:
         event = pygame.event.wait()
         if event.type == pygame.KEYDOWN:
@@ -77,6 +82,11 @@ def main():
                 print_note(key)
                 print_rgb(key)
                 play_key(key)
+
+                player.note_on(keys[key][1], 100)
+                time.sleep(1)
+                player.note_off(keys[key][1], 100)
+
                 add_note(m_file, key, t)
                 t += 1
             else:
@@ -84,6 +94,8 @@ def main():
         time.sleep(0.05)
     with open('out.mid', 'wb') as output:
         m_file.writeFile(output)
+    player.close()
+    pygame.midi.quit()
 
 
 if __name__ == '__main__':
