@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
@@ -12,26 +10,41 @@ from tkinter import *
 
 color_codes = []
 colors = [[0, 0, 255], [255, 133, 0], [255, 0, 0], [0, 255, 0], [255, 255, 255]]
+WHITE = (255, 255, 255)
+GREY = (120, 120, 120)
+BLACK = (0, 0, 0)
 
 keys = {
-        's': ('do', 60),
-        'e': ('do#', 61),
-        'd': ('re', 62),
-        'r': ('re#', 63),
-        'f': ('mi', 64),
-        'g': ('fa', 65),
-        'y': ('fa#', 66),
-        'h': ('sol', 67),
-        'u': ('sol#', 68),
-        'j': ('la', 69),
-        'i': ('la#', 70),
-        'k': ('si', 71),
-        'l': ('do', 72),
+        's': ('do', 60,  (50,  50, 50, 200), WHITE),
+        'd': ('re', 62,  (105, 50, 50, 200), WHITE),
+        'f': ('mi', 64,  (160, 50, 50, 200), WHITE),
+        'g': ('fa', 65,  (215, 50, 50, 200), WHITE),
+        'h': ('sol', 67, (270, 50, 50, 200), WHITE),
+        'j': ('la', 69,  (325, 50, 50, 200), WHITE),
+        'k': ('si', 71,  (380, 50, 50, 200), WHITE),
+        'l': ('do', 72,  (435, 50, 50, 200), WHITE),
+        'r': ('re#', 63, (132.5, 50, 50, 100), BLACK),
+        'y': ('fa#', 66, (242.5, 50, 50, 100), BLACK),
+        'u': ('sol#', 68, (297.5, 50, 50, 100), BLACK),
+        'i': ('la#', 70, (352.5, 50, 50, 100), BLACK),
+        'e': ('do#', 61, (77.5, 50, 50, 100), BLACK),
         }
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)
+"""keys = {
+        's': ('do', 60,  (50,  50, 50, 200), WHITE),
+        'e': ('do#', 61, (77.5,  50, 50, 100), BLACK),
+        'd': ('re', 62,  (105, 50, 50, 200), WHITE),
+        'r': ('re#', 63, (132.5,  50, 50, 100), BLACK),
+        'f': ('mi', 64,  (160, 50, 50, 200), WHITE),
+        'g': ('fa', 65,  (215, 50, 50, 200), WHITE),
+        'y': ('fa#', 66, (242.5,  50, 50, 100), BLACK),
+        'h': ('sol', 67, (270, 50, 50, 200), WHITE),
+        'u': ('sol#', 68,(297.5,  50, 50, 100), BLACK),
+        'j': ('la', 69,  (325, 50, 50, 200), WHITE),
+        'i': ('la#', 70, (352.5,  50, 50, 100), BLACK),
+        'k': ('si', 71,  (380, 50, 50, 200), WHITE),
+        'l': ('do', 72,  (435, 50, 50, 200), WHITE),
+        }"""
 
 #def get_config_filename():
 #    root_win = tkinter.Tk()
@@ -53,18 +66,14 @@ def print_note(key):
 def print_rgb(key):
     print(color_codes[keys[key][1]])
 
-def set_rgb(key, screen):
-    screen.fill(colors[color_codes[keys[key][1]]])
-    pygame.display.update()
-
 def add_note(m_file, key, time):
-    m_file.addNote(0, 0, keys[key][1], time, 1, 100)
+    m_file.addNote(0, 0, keys[key][1], time, 1, 127)
 
 def main():
     t = 0
+    m_file = midiutil.MIDIFile(1)
     #tempo = 120
     #pygame.mixer.init(fps, -16, 1, 2048)
-    m_file = midiutil.MIDIFile(1)
     #m_file.addTempo(0, time, tempo)
     #config_file = get_config_filename()
     #config_file = anma.conf
@@ -76,23 +85,24 @@ def main():
     init(config_file) # Read config
     screen = pygame.display.set_mode((535, 300), 0, 32)
     pygame.display.set_caption('anma')
-
+    screen.fill(GREY)
     pygame.midi.init()
+    out_id = pygame.midi.get_default_output_id()
     player = pygame.midi.Output(0)
+
     player.set_instrument(0)
 
+    while True :
+
+        #player = pygame.midi.Output(out_id)
+        player.set_instrument(3)
     while True:
+
         event = pygame.event.wait()
 
-        do1 = pygame.draw.rect(screen, WHITE, (50, 50, 50, 200))
-        ree = pygame.draw.rect(screen, WHITE, (105, 50, 50, 200))
-        mii = pygame.draw.rect(screen, WHITE, (160, 50, 50, 200))
-        faa = pygame.draw.rect(screen, WHITE, (215, 50, 50, 200))
-        soll = pygame.draw.rect(screen, WHITE, (270, 50, 50, 200))
-        laa = pygame.draw.rect(screen, WHITE, (325, 50, 50, 200))
-        sii = pygame.draw.rect(screen, WHITE, (380, 50, 50, 200))
-        do2 = pygame.draw.rect(screen, WHITE, (435, 50, 50, 200))
-        pygame.display.update()
+        for key in keys:
+            pygame.draw.rect(screen, keys[key][3], keys[key][2])
+            pygame.display.update()
 
         if event.type == pygame.KEYDOWN:
             key = get_key(event)
@@ -101,31 +111,32 @@ def main():
                 pygame.quit()
                 break
 
-            if  event.key == pygame.K_s:
-                doo = pygame.draw.rect(screen, colors[color_codes[keys[key][1]]], (50, 50, 50, 200))
-                pygame.display.update()
-
-            if  event.key == pygame.K_d:
-                ree = pygame.draw.rect(screen, colors[color_codes[keys[key][1]]], (105, 50, 50, 200))
-                pygame.display.update()
-
             if  key in keys:
                 print_note(key)
                 print_rgb(key)
-                #set_rgb(key, screen)
 
+                pygame.draw.rect(screen, colors[color_codes[keys[key][1]]], keys[key][2])
+                pygame.display.update()
                 player.note_on(keys[key][1], 100)
+
+                set_rgb(key, screen)
+
+                player.note_on(keys[key][1], 127)
+
+
                 add_note(m_file, key, t)
                 t += 1
-
-            else:
-                print("key " + key + " is not mapped")
 
         elif event.type == pygame.KEYUP:
             key = get_key(event)
 
-            if  key in keys:
+
+            if key in keys:
                 player.note_off(keys[key][1], 100)
+
+
+            if  key in keys:
+                player.note_off(keys[key][1], 127)
 
         time.sleep(0.05)
 
