@@ -54,7 +54,7 @@ def set_rgb(key, screen):
     pygame.display.update()
 
 def add_note(m_file, key, time):
-    m_file.addNote(0, 0, keys[key][1], time, 1, 100)
+    m_file.addNote(0, 0, keys[key][1], time, 1, 127)
 
 def main():
     t = 0
@@ -71,8 +71,10 @@ def main():
     pygame.display.update()
 
     pygame.midi.init()
+    out_id = pygame.midi.get_default_output_id()
     player = pygame.midi.Output(0)
-    player.set_instrument(0)
+    #player = pygame.midi.Output(out_id)
+    player.set_instrument(3)
     while True:
         event = pygame.event.wait()
         if event.type == pygame.KEYDOWN:
@@ -85,7 +87,7 @@ def main():
                 print_rgb(key)
                 set_rgb(key, screen)
 
-                player.note_on(keys[key][1], 100)
+                player.note_on(keys[key][1], 127)
 
                 add_note(m_file, key, t)
                 t += 1
@@ -94,7 +96,7 @@ def main():
         elif event.type == pygame.KEYUP:
             key = get_key(event)
             if  key in keys:
-                player.note_off(keys[key][1], 100)
+                player.note_off(keys[key][1], 127)
         time.sleep(0.05)
     with open('out.mid', 'wb') as output:
         m_file.writeFile(output)
