@@ -14,7 +14,28 @@ WHITE = (255, 255, 255)
 GREY = (120, 120, 120)
 BLACK = (0, 0, 0)
 
+trans = str.maketrans('qm', 'a;')
 keys = {
+        'a': ('do1', 48,  (50,  50, 50, 200), WHITE),
+        's': ('re1', 50,  (105, 50, 50, 200), WHITE),
+        'd': ('mi1', 52,  (160, 50, 50, 200), WHITE),
+        'f': ('fa1', 53,  (215, 50, 50, 200), WHITE),
+        'g': ('sol1', 55, (270, 50, 50, 200), WHITE),
+        'h': ('la1', 57,  (325, 50, 50, 200), WHITE),
+        'j': ('si1', 59,  (380, 50, 50, 200), WHITE),
+        'k': ('do2', 60,  (435, 50, 50, 200), WHITE),
+        'l': ('re2', 62,  (490, 50, 50, 200), WHITE),
+        ';': ('mi2', 64,  (545, 50, 50, 200), WHITE),
+        'w': ('do#1', 49, (77.5, 50, 50, 100), BLACK),
+        'e': ('re#1', 51, (132.5, 50, 50, 100), BLACK),
+        't': ('fa#1', 54, (242.5, 50, 50, 100), BLACK),
+        'y': ('sol1#', 56, (297.5, 50, 50, 100), BLACK),
+        'u': ('la#1', 58, (352.5, 50, 50, 100), BLACK),
+        'o': ('do#2', 61, (462.5, 50, 50, 100), BLACK),
+        'p': ('re#2', 63, (517.5, 50, 50, 100), BLACK),
+        }
+
+"""keys = {
         's': ('do', 60,  (50,  50, 50, 200), WHITE),
         'd': ('re', 62,  (105, 50, 50, 200), WHITE),
         'f': ('mi', 64,  (160, 50, 50, 200), WHITE),
@@ -28,22 +49,6 @@ keys = {
         'u': ('sol#', 68, (297.5, 50, 50, 100), BLACK),
         'i': ('la#', 70, (352.5, 50, 50, 100), BLACK),
         'e': ('do#', 61, (77.5, 50, 50, 100), BLACK),
-        }
-
-"""keys = {
-        's': ('do', 60,  (50,  50, 50, 200), WHITE),
-        'e': ('do#', 61, (77.5,  50, 50, 100), BLACK),
-        'd': ('re', 62,  (105, 50, 50, 200), WHITE),
-        'r': ('re#', 63, (132.5,  50, 50, 100), BLACK),
-        'f': ('mi', 64,  (160, 50, 50, 200), WHITE),
-        'g': ('fa', 65,  (215, 50, 50, 200), WHITE),
-        'y': ('fa#', 66, (242.5,  50, 50, 100), BLACK),
-        'h': ('sol', 67, (270, 50, 50, 200), WHITE),
-        'u': ('sol#', 68,(297.5,  50, 50, 100), BLACK),
-        'j': ('la', 69,  (325, 50, 50, 200), WHITE),
-        'i': ('la#', 70, (352.5,  50, 50, 100), BLACK),
-        'k': ('si', 71,  (380, 50, 50, 200), WHITE),
-        'l': ('do', 72,  (435, 50, 50, 200), WHITE),
         }"""
 
 #def get_config_filename():
@@ -53,7 +58,7 @@ keys = {
 
 def init(config_file):
     global color_codes
-    with open("anma.conf", "r") as conf:
+    with open("misc/anma.conf", "r") as conf:
         color_codes = [int(line.strip()) for line in conf.readlines()]
 
 def get_key(event):
@@ -78,25 +83,21 @@ def main():
     #config_file = get_config_filename()
     #config_file = anma.conf
 
-    with open("anma.conf", "r") as config_file:
+    with open("./misc/anma.conf", "r") as config_file:
         config_file.read()
 
     pygame.init()
     init(config_file) # Read config
-    screen = pygame.display.set_mode((535, 300), 0, 32)
+    screen = pygame.display.set_mode((640, 300), 0, 32)
     pygame.display.set_caption('anma')
     screen.fill(GREY)
     pygame.midi.init()
     out_id = pygame.midi.get_default_output_id()
     player = pygame.midi.Output(0)
-
-    player.set_instrument(0)
+    #player.set_instrument(6)
 
     while True :
-
         #player = pygame.midi.Output(out_id)
-        player.set_instrument(3)
-    while True:
 
         event = pygame.event.wait()
 
@@ -112,36 +113,47 @@ def main():
                 break
 
             if  key in keys:
-                print_note(key)
-                print_rgb(key)
-
+                #print_note(key)
+                #print_rgb(key)
                 pygame.draw.rect(screen, colors[color_codes[keys[key][1]]], keys[key][2])
                 pygame.display.update()
                 player.note_on(keys[key][1], 100)
-
-                set_rgb(key, screen)
-
                 player.note_on(keys[key][1], 127)
+                #add_note(m_file, key, t)
+                #t += 1
 
+            elif event.key == pygame.K_1:
+                player.set_instrument(1)
+            elif event.key == pygame.K_2:
+                player.set_instrument(40)
+            elif event.key == pygame.K_3:
+                player.set_instrument(95)
+            elif event.key == pygame.K_4:
+                player.set_instrument(87)
+            elif event.key == pygame.K_5:
+                player.set_instrument(115)
+            elif event.key == pygame.K_6:
+                player.set_instrument(6)
+            elif event.key == pygame.K_7:
+                player.set_instrument(7)
+            elif event.key == pygame.K_8:
+                player.set_instrument(19)
+            elif event.key == pygame.K_9:
+                player.set_instrument(91)
 
-                add_note(m_file, key, t)
-                t += 1
+            else:
+                print("key " + key + " is not mapped")
 
         elif event.type == pygame.KEYUP:
             key = get_key(event)
 
-
             if key in keys:
                 player.note_off(keys[key][1], 100)
 
+#        time.sleep(0.005)
 
-            if  key in keys:
-                player.note_off(keys[key][1], 127)
-
-        time.sleep(0.05)
-
-    with open('out.mid', 'wb') as output:
-        m_file.writeFile(output)
+   # with open('out.mid', 'wb') as output:
+    #    m_file.writeFile(output)
     player.close()
     pygame.midi.quit()
 
