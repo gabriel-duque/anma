@@ -1,108 +1,39 @@
 #!/usr/bin/env python3
 
-import contextlib
-with contextlib.redirect_stdout(None):
-    import pygame
-    import pygame.midi
+import args
+import config
+import handle
 
-import midiutil
-import time
-import tkinter
-import tkinter.filedialog
-
-color_codes = []
-colors = [[0, 0, 255], [255, 133, 0], [255, 0, 0], [0, 255, 0], [255, 255, 255]]
-
-keys = {
-        's': ('do', 60),
-        'e': ('do#', 61),
-        'd': ('re', 62),
-        'r': ('re#', 63),
-        'f': ('mi', 64),
-        'g': ('fa', 65),
-        'y': ('fa#', 66),
-        'h': ('sol', 67),
-        'u': ('sol#', 68),
-        'j': ('la', 69),
-        'i': ('la#', 70),
-        'k': ('si', 71),
-        'l': ('do', 72),
-        }
-
-def get_config_filename():
-    root_win = tkinter.Tk()
-    root_win.withdraw()
-    tkinter.filedialog.askopenfilename()
-
-def init(config_file):
-    global color_codes
-    with open("anma.conf", "r") as conf:
-        color_codes = [int(line.strip()) for line in conf.readlines()]
-
-def get_key(event):
-    return pygame.key.name(event.key)
-
-def print_note(key):
-    print(key, end=" ")
-    print(keys[key][0], end=" ")
-
-def print_rgb(key):
-    print(color_codes[keys[key][1]])
-
-def set_rgb(key, screen):
-    screen.fill(colors[color_codes[keys[key][1]]])
-    pygame.display.update()
-
-def add_note(m_file, key, time):
-    m_file.addNote(0, 0, keys[key][1], time, 1, 127)
 
 def main():
-    t = 0
-    tempo = 120
-    #pygame.mixer.init(fps, -16, 1, 2048)
-    m_file = midiutil.MIDIFile(1)
-    #m_file.addTempo(0, time, tempo)
-    config_file = get_config_filename()
-    init(config_file) # Read config
-    screen = pygame.display.set_mode((220, 220))
-    pygame.display.set_caption('anma')
-    bg = pygame.image.load('cat.png')
-    screen.blit(bg, (0, 0))
-    pygame.display.update()
+    """Run the program.
 
-    pygame.midi.init()
-    out_id = pygame.midi.get_default_output_id()
-    player = pygame.midi.Output(0)
-    #player = pygame.midi.Output(out_id)
-    player.set_instrument(3)
-    while True:
-        event = pygame.event.wait()
-        if event.type == pygame.KEYDOWN:
-            key = get_key(event)
-            if event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                break
-            if  key in keys:
-                print_note(key)
-                print_rgb(key)
-                set_rgb(key, screen)
+    * Parse command-line arguments for output file name, config name etc.
+    * Get colors scheme for each note from config file.
+    * Initialize PyGame library.
+    * Dump config if verbose is active.
+    * Create an instance of the AnmaHandle class to handle everything.
+    * Loop and get notes until user exits.
+    * Write the resulting MIDI file.
+    * Cleanup.
+    """
+    arg = args.parse_args()
+    colors = config.parse_colors(arg.conf)
+    screen, player = config.init_pygame(arg.midi_output, arg.background)
 
-                player.note_on(keys[key][1], 127)
+    if arg.verbose:
+        args.dump_config(arg)
 
-                add_note(m_file, key, t)
-                t += 1
-            else:
-                print("key " + key + " is not mapped")
-        elif event.type == pygame.KEYUP:
-            key = get_key(event)
-            if  key in keys:
-                player.note_off(keys[key][1], 127)
-        time.sleep(0.05)
-    with open('out.mid', 'wb') as output:
-        m_file.writeFile(output)
-    player.close()
-    pygame.midi.quit()
+    hndl = handle.AnmaHandle(arg, colors, screen, player)
+    if arg.verbose:
+        for note in hndl.notes:
+            print(f"{note.name} {note.pitch}")
 
+    while hndl.loop():
+        pass
+
+    #hndl.write_midi()
+    #hndl.cleanup()
 
 if __name__ == '__main__':
     main()
