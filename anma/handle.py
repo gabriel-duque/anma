@@ -17,7 +17,12 @@ class AnmaHandle:
         self.notes = config.init_notes(colors)
 
     def loop(self):
-        event = pygame.event.wait()
+        #event = pygame.event.wait()
+        event = pygame.event.poll()
+        while event.type == pygame.NOEVENT:
+            event = pygame.event.poll()
+            #time.sleep(0)
+
         if event.type == pygame.KEYDOWN:
             key = pygame.key.name(event.key)
             if event.key == pygame.K_ESCAPE:
@@ -30,5 +35,4 @@ class AnmaHandle:
             key = pygame.key.name(event.key)
             if  key in self.keys:
                 self.notes[self.keys[key] - 21].stop(self)
-        #time.sleep(0.05)
         return True
