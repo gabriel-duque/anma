@@ -1,1 +1,19 @@
 # anma:
+
+## Music:
+	[x] create MIDI file
+	[x] get notes
+	[x] fix arch
+	[x] initialize notes
+	[ ] fix key input lag
+	[ ] get input from actual MIDI piano keyboard
+
+## Graphics:
+	[x] load color scheme
+	[~] draw piano
+	[ ] get "incremental" colorscheme edition algorithm
+	[ ] ? implement some dumb machine learning ?
+
+## Hardware:
+	[ ] setup raspberry pi
+	[ ] setup LEDs on keyboard
