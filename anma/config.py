@@ -28,5 +28,5 @@ def init_notes(colors):
     pitch_count = 88
     names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
     # 21 is the MIDI pitch for the first piano key (A0)
-    return [note.Note(names[i % 12] + str((i + 9) // 12), 21 + i, colors[21 + i])
-            for i in range(pitch_count)]
+    return [note.Note(names[i % 12] + str((i + 9) // 12),
+            21 + i, colors[21 + i]) for i in range(pitch_count)]
