@@ -20,14 +20,15 @@ def main():
     arg = args.parse_args()
     colors = config.parse_colors(arg.conf)
     screen, player = config.init_pygame(arg.midi_output, arg.background)
+    led_hndl = config.init_gpio()
 
     if arg.verbose:
         args.dump_config(arg)
 
-    hndl = handle.AnmaHandle(arg, colors, screen, player)
+    hndl = handle.AnmaHandle(arg, colors, screen, player, led_hndl)
     if arg.verbose:
         for note in hndl.notes:
-            print(f"{note.name} {note.pitch}")
+            print("{} {}".format(note.name, note.pitch))
 
     while hndl.loop():
         pass

@@ -15,9 +15,10 @@ def parse_args():
     return args
 
 def dump_config(arg):
-    print(
-            f'Verbose: {"on" if arg.verbose else "off"}\n'
-            f'Keymap configuration: {arg.conf}\n'
-            f'Background image: {arg.background}\n'
-            f'Midi output identifier: {arg.midi_output}'
-    )
+    print("totototototot")
+    #print(
+    #        f'Verbose: {"on" if arg.verbose else "off"}\n'
+    #        f'Keymap configuration: {arg.conf}\n'
+    #        f'Background image: {arg.background}\n'
+    #        f'Midi output identifier: {arg.midi_output}'
+    #)
