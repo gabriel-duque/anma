@@ -27,7 +27,8 @@ class AnmaHandle:
             key = pygame.key.name(event.key)
             if event.key == pygame.K_ESCAPE:
                 return False
-            if  key in self.keys:
+            if key in self.keys:
+                # Calculate the right color
                 self.notes[self.keys[key] - 21].play(self)
             else:
                 print('Key {} is not mapped'.format(key))

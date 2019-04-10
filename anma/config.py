@@ -10,7 +10,9 @@ import RPi.GPIO as GPIO
 led_ports = [[17, 22, 27], [18, 23, 24]]
 freq = 100
 
+WHITE = (255, 255, 255)
 GREY = (120, 120, 120)
+BLACK = (0, 0, 0)
 
 def parse_colors(color_config):
     with open(color_config, "r") as color_input:
@@ -26,14 +28,32 @@ def init_pygame(midi_output, bg_file):
 
     player = pygame.midi.Output(3)
     player.set_instrument(1)
+
     return screen, player
 
 def init_notes(colors, led_hndl):
     pitch_count = 88
     names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
     # 21 is the MIDI pitch for the first piano key (A0)
-    return [note.Note(names[i % 12] + str((i + 9) // 12),
-            21 + i, led.Led(led_hndl[i % 2])) for i in range(pitch_count)]
+    notes = []
+    white_x = 50
+    black_x = 110
+    for i in range(pitch_count):
+        if i < 60 or i > 76:
+            coord = (0,0,0,0)
+        else:
+            if len(names[i % 12]) == 1: # White note
+                coord = (white_x, 50, 100, 500)
+                white_x += 110
+            else:
+                coord = (black_x, 50, 90, 250)
+                if names[i % 12 ] in ['D#', 'A#']:
+                    black_x += 110
+                black_x += 110
+        curr = note.Note(names[i % 12] + str((i + 9) // 12),21 + i, led.Led(led_hndl[i % 2]), coord)
+        notes.append(curr)
+
+    return notes
 
 def init_gpio():
     GPIO.setmode(GPIO.BCM) 

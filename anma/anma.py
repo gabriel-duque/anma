@@ -26,6 +26,14 @@ def main():
         args.dump_config(arg)
 
     hndl = handle.AnmaHandle(arg, colors, screen, player, led_hndl)
+    for i in range(60, 76):
+        if '#' not in hndl.notes[i].name:    
+            hndl.notes[i].update_screen(hndl, (255, 255, 255))
+
+    for i in range(60, 76):
+        if '#' in hndl.notes[i].name:    
+            hndl.notes[i].update_screen(hndl, (0, 0, 0))
+
     if arg.verbose:
         for note in hndl.notes:
             print("{} {}".format(note.name, note.pitch))
